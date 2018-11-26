@@ -1,18 +1,28 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TimeField;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\DataList;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
+
 class CalendarDateTime extends DataObject {
 	
-	private static $db = array (		
+	private static $db = [
 		'StartDate' => 'Date',
 		'StartTime' => 'Time',
 		'EndDate' => 'Date',
 		'EndTime' => 'Time',
 		'AllDay' => 'Boolean'		
-	);
+	];
 	
-	private static $has_one = array (
-		'Event' => 'CalendarEvent'
-	);
+	private static $has_one = [
+		'Event' => CalendarEvent::class
+	];
 
 	private static $date_format_override;
 
@@ -30,7 +40,8 @@ class CalendarDateTime extends DataObject {
 	private static $offset = "+00:00";
 
 	public function getCMSFields() {
-		DateField::set_default_config('showcalendar', true);
+		//DateField::set_default_config('showcalendar', true);
+        
 		$f = new FieldList(
 			new DateField('StartDate',_t('CalendarDateTime.STARTDATE','Start date')),
 			new DateField('EndDate',_t('CalendarDateTime.ENDDATE','End date')),
@@ -66,7 +77,10 @@ class CalendarDateTime extends DataObject {
 		$html .=    ($strEndDate != "") ? $strEndDate : "";
 		$html .=  "</span>";
 		
-		return $html;
+        $htmlText = SilverStripe\ORM\FieldType\DBHTMLText::create();
+        $htmlText->setValue($html);
+        
+		return $htmlText;
 	}
 	
 	public function TimeRange() {
@@ -89,7 +103,7 @@ class CalendarDateTime extends DataObject {
 			return $this->Event()->Parent()->getNextRecurringEvents($this->Event(), $this);
 		}
 		
-		return DataList::create($this->class)
+		return DataList::create($this->ClassName)
 			->where("EventID = {$this->EventID}")
 			->where("StartDate != '{$this->StartDate}'")
 			->limit($this->Event()->Parent()->OtherDatesCount);
@@ -199,48 +213,48 @@ class CalendarDateTime extends DataObject {
 		return $dates;
 	}
 	
-	public function canCreate($member = null) {
-		if (!$member) {
-			$member = Member::currentUser();
-		}
-		$extended = $this->extendedCan(__FUNCTION__, $member);
-		if($extended !== null) {
-			return $extended;
-		}
-		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-	}
-
-	public function canEdit($member = null) {
-		if (!$member) {
-			$member = Member::currentUser();
-		}
-		$extended = $this->extendedCan(__FUNCTION__, $member);
-		if($extended !== null) {
-			return $extended;
-		}
-		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-	}
-
-	public function canDelete($member = null) {
-		if (!$member) {
-			$member = Member::currentUser();
-		}
-		$extended = $this->extendedCan(__FUNCTION__, $member);
-		if($extended !== null) {
-			return $extended;
-		}
-		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-	}
-
-	public function canView($member = null) {
-		if (!$member) {
-			$member = Member::currentUser();
-		}
-		$extended = $this->extendedCan(__FUNCTION__, $member);
-		if($extended !== null) {
-			return $extended;
-		}
-		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-	}
+//	public function canCreate($member = null) {
+//		if (!$member) {
+//			$member = Security::getCurrentUser();
+//		}
+//		$extended = $this->extendedCan(__FUNCTION__, $member);
+//		if($extended !== null) {
+//			return $extended;
+//		}
+//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+//	}
+//
+//	public function canEdit($member = null) {
+//		if (!$member) {
+//			$member = Security::getCurrentUser();
+//		}
+//		$extended = $this->extendedCan(__FUNCTION__, $member);
+//		if($extended !== null) {
+//			return $extended;
+//		}
+//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+//	}
+//
+//	public function canDelete($member = null) {
+//		if (!$member) {
+//			$member = Security::getCurrentUser();
+//		}
+//		$extended = $this->extendedCan(__FUNCTION__, $member);
+//		if($extended !== null) {
+//			return $extended;
+//		}
+//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+//	}
+//
+//	public function canView($member = null) {
+//		if (!$member) {
+//			$member = Security::getCurrentUser();
+//		}
+//		$extended = $this->extendedCan(__FUNCTION__, $member);
+//		if($extended !== null) {
+//			return $extended;
+//		}
+//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+//	}
 
 }

@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\View\ViewableData;
+use SilverStripe\View\Requirements;
+use SilverStripe\Core\Convert;
 
 class CalendarWidget extends ViewableData {
 	
@@ -38,7 +41,9 @@ class CalendarWidget extends ViewableData {
 	}
 
 	public function forTemplate() {
-		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");		
+        if(!Calendar::config()->get('jquery_included')) {
+            Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
+        }	
 		Requirements::javascript("event_calendar/javascript/calendar_widget.js");
 		$locale_file = _t('Calendar.DATEJSFILE','calendar_en.js');
 		Requirements::javascript("event_calendar/javascript/lang/{$locale_file}");

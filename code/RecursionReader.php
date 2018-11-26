@@ -1,6 +1,6 @@
 <?php
 
-class RecursionReader extends Object {
+class RecursionReader {
 	
 	const DAY = 86400;
 

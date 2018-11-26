@@ -1,5 +1,7 @@
 <?php
 
+use SilverStripe\Forms\TimeField;
+
 class CalendarTimeField extends TimeField {
 
 	function Field($properties = array()) {

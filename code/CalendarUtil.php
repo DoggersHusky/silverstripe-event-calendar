@@ -70,12 +70,12 @@ class CalendarUtil {
 		);	
 	}
 	
-	public static function localize($start, $end, $key) {
+	public static function localize($start, $end, $key, $locale) {
 		global $customDateTemplates;
 		if(is_array($customDateTemplates) && isset($customDateTemplates[$key]))
 			$template = $customDateTemplates[$key];
 		else {
-			$template = _t("Calendar.$key"); 
+			$template = _t("Calendar.$key",$locale); 
 		}
 		
 		return str_replace(self::$format_character_placeholders, self::format_character_replacements($start,$end), $template);		
@@ -124,7 +124,7 @@ class CalendarUtil {
 				$key = self::DIFF_MONTH_DIFF_YEAR;
 			}
 		}
-		$date_string = self::localize($start, $end, $key);		
+		$date_string = self::localize($start, $end, $key, Calendar::config()->get('language'));		
 		$break = strpos($date_string, '$End');		
 		if($break !== FALSE) {
 			$strStartDate = substr($date_string, 0, $break);

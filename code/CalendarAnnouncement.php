@@ -1,15 +1,18 @@
 <?php
 
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\TextareaField;
+
 class CalendarAnnouncement extends CalendarDateTime {
 
-	private static $db = array (
+	private static $db = [
 		'Title' => 'Varchar(255)',
 		'Content' => 'Text'
-	);
+	];
 
-	private static $has_one = array (
+	private static $has_one = [
 		'Calendar' => 'Calendar'
-	);
+	];
 
 	public function getCMSFields() {
 		

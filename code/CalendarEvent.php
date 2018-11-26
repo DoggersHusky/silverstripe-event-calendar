@@ -1,8 +1,20 @@
 <?php
 
+use SilverStripe\View\Requirements;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\LabelField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\DataList;
+use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\CheckboxSetField;
+
 class CalendarEvent extends Page {
 	
-	private static $db = array (
+	private static $db = [
 		'Location' => 'Text',
 		'Recursion' => 'Boolean',
 		'CustomRecursionType' => 'Int',
@@ -13,17 +25,17 @@ class CalendarEvent extends Page {
 		'MonthlyRecursionType2' => 'Int',
 		'MonthlyIndex' => 'Int',
 		'MonthlyDayOfWeek' => 'Int'
-	);
+	];
 	
-	private static $has_many = array (
-		'DateTimes' => 'CalendarDateTime',
-		'Exceptions' => 'RecurringException'
-	);
+	private static $has_many = [
+		'DateTimes' => CalendarDateTime::class,
+		'Exceptions' => RecurringException::class
+	];
 	
-	private static $many_many = array (
-		'RecurringDaysOfWeek' => 'RecurringDayOfWeek',
-		'RecurringDaysOfMonth' => 'RecurringDayOfMonth'
-	);
+	private static $many_many = [
+		'RecurringDaysOfWeek' => RecurringDayOfWeek::class,
+		'RecurringDaysOfMonth' => RecurringDayOfMonth::class
+	];
 
 	private static $icon = "event_calendar/images/event";	
 
@@ -144,94 +156,6 @@ class CalendarEvent extends Page {
 
 	public function CalendarWidget() {
 		return $this->Parent()->CalendarWidget();
-	}
-
-}
-
-class CalendarEvent_Controller extends Page_Controller {
-
-	public function init() {
-		parent::init();
-		Requirements::themedCSS('calendar','event_calendar');
-	}
-	
-	public function MultipleDates() {
-		return DataList::create($this->data()->getDateTimeClass())
-			->filter("EventID", $this->ID)
-			->sort("\"StartDate\" ASC")
-			->count() > 1;
-	}
-	
-	public function DateAndTime() {
-		return DataList::create($this->data()->getDateTimeClass())
-			->filter("EventID", $this->ID)
-			->sort("\"StartDate\" ASC");
-	}
-	
-	public function UpcomingDates($limit = 3) {
-		return DataList::create($this->data()->getDateTimeClass())
-			->filter("EventID", $this->ID)
-			->where("\"StartDate\" >= DATE(NOW())")
-			->sort("\"StartDate\" ASC")
-			->limit($limit);
-	}
-	
-	public function OtherDates() {
-		if(!isset($_REQUEST['date'])) {
-			$date_obj =  $this->DateAndTime()->first();
-			if(!$date_obj) return false;
-			else $date = $date_obj->StartDate;
-		}
-		elseif(strtotime($_REQUEST['date']) > 0) {
-			$date = date('Y-m-d', strtotime($_REQUEST['date']));
-		}
-		
-		$cal = $this->Parent();
-
-		if($this->Recursion == 1) {
-			$datetime_obj = DataList::create($this->data()->getDateTimeClass())
-				->where("EventID = {$this->ID}")
-				->first();
-			$datetime_obj->StartDate = $date;
-			return $cal->getNextRecurringEvents($this, $datetime_obj);
-		}
-		else {
-			return DataList::create($this->data()->getDateTimeClass())
-				->filter(array(
-					"EventID" => $this->ID
-				))
-				->exclude(array(
-					"StartDate" => $date
-				))
-				->sort("StartDate ASC")
-				->limit($cal->OtherDatesCount);
-		}
-		return false;
-	}
-
-
-	
-	public function CurrentDate() {
-		$allDates = DataList::create($this->data()->getDateTimeClass())
-			->filter("EventID", $this->ID)
-			->sort("\"StartDate\" ASC");
-		if(!isset($_REQUEST['date'])) {
-			// If no date filter specified, return the first one
-			return $allDates->first();
-		} elseif(strtotime($_REQUEST['date']) > 0) {
-			$date = date('Y-m-d', strtotime($_REQUEST['date']));
-			if($this->Recursion) {
-				$datetime = $allDates->first();
-				if($datetime) {
-					$datetime->StartDate = $date;
-					$datetime->EndDate = $date;
-					return $datetime;
-				}
-			}
-			return $allDates
-				->filter("StartDate", $date)
-				->first();
-		}
 	}
 
 }

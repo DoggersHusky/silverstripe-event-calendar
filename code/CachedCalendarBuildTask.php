@@ -1,5 +1,7 @@
 <?php
 
+use SilverStripe\Dev\BuildTask;
+
 class CachedCalendarBuildTask extends BuildTask {
 
 	protected $title = "Cache the Event Calendars";

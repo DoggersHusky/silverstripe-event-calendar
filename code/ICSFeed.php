@@ -1,15 +1,19 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
+
 class ICSFeed extends DataObject {
 	
-	private static $db = array (
+	private static $db = [
 		'Title' => 'Varchar(100)',
 		'URL' => 'Varchar(255)'
-	);
+	];
 
-	private static $has_one = array (
+	private static $has_one = [
 		'Calendar' => 'Calendar'
-	);
+	];
 
 	public function getCMSFields() {
 		$f = new FieldList (

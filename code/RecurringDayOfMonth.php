@@ -1,14 +1,18 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataList;
+use SilverStripe\Security\Permission;
+
 class RecurringDayOfMonth extends DataObject {
 	
-	private static $db = array (
+	private static $db = [
 		'Value' => 'Int'
-	);
+	];
 
-	private static $belongs_many_many = array (
+	private static $belongs_many_many = [
 		'CalendarEvent' => 'CalendarEvent'
-	);
+	];
 	
 	private static $default_sort = "Value ASC";
 	
@@ -35,20 +39,20 @@ class RecurringDayOfMonth extends DataObject {
 	}
 
 
-	public function canCreate($member = null) {
-	    return Permission::check("CMS_ACCESS_CMSMain");
-	}
-	
-	public function canEdit($member = null) {
-	    return Permission::check("CMS_ACCESS_CMSMain");
-	}
-	
-	public function canDelete($member = null) {
-	    return Permission::check("CMS_ACCESS_CMSMain");
-	}
-	
-	public function canView($member = null) {
-	    return Permission::check("CMS_ACCESS_CMSMain");
-	}
+//	public function canCreate($member = null) {
+//	    return Permission::check("CMS_ACCESS_CMSMain");
+//	}
+//	
+//	public function canEdit($member = null) {
+//	    return Permission::check("CMS_ACCESS_CMSMain");
+//	}
+//	
+//	public function canDelete($member = null) {
+//	    return Permission::check("CMS_ACCESS_CMSMain");
+//	}
+//	
+//	public function canView($member = null) {
+//	    return Permission::check("CMS_ACCESS_CMSMain");
+//	}
 	
 }

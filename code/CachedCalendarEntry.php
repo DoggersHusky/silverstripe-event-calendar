@@ -1,8 +1,10 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+
 class CachedCalendarEntry extends DataObject {
 
-	 private static $db = array (		
+	 private static $db = [		
 		'StartDate' => 'Date',
 		'StartTime' => 'Time',
 		'EndDate' => 'Date',
@@ -14,13 +16,13 @@ class CachedCalendarEntry extends DataObject {
 		'ICSLink' => 'Varchar(100)',
 		'Title' => 'Varchar(255)',
 		'Content' => 'HTMLText'
-	);
+	];
 
-	private static $has_one = array (
+	private static $has_one = [
 		'CachedCalendar' => 'Calendar',
 		'Calendar' => 'Calendar',
 		'Event' => 'CalendarEvent'
-	);
+	];
 	
 	private static $default_sort = "StartDate ASC, StartTime ASC";
 
