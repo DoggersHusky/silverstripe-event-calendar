@@ -54,10 +54,12 @@ class CachedCalendarEntry extends DataObject {
 			))
 			->limit($this->CachedCalendar()->OtherDatesCount);
 	}
+    
+//    public function Link() {
+//        
+//    }
 
-
-
-	public function hydrate(CalendarDateTime $dt, Calendar $calendar) {
+    public function hydrate(CalendarDateTime $dt, Calendar $calendar) {
 		$this->CachedCalendarID = $calendar->ID;
 		foreach($dt->db() as $field => $type) {
 			$this->$field = $dt->$field;

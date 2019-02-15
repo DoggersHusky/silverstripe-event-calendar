@@ -37,7 +37,7 @@ class CalendarEvent extends Page {
 		'RecurringDaysOfMonth' => RecurringDayOfMonth::class
 	];
 
-	private static $icon = "event_calendar/images/event";	
+	private static $icon = "resources/event_calendar/images/event-file.gif";	
 
 	private static $description = "An individual event entry";
 

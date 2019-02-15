@@ -172,12 +172,12 @@ class CalendarDateTime extends DataObject {
 
 	public function getFormattedStartDate() {
 	   if(!$this->StartDate) return "--";
-	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('StartDate')->Format('m-d-Y') : $this->obj('StartDate')->Format('d-m-Y');
+	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('StartDate')->Format('M-d-Y') : $this->obj('StartDate')->Format('d-M-Y');
 	}
 	
 	public function getFormattedEndDate() {
 	   if(!$this->EndDate) return "--";
-	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('EndDate')->Format('m-d-Y') : $this->obj('EndDate')->Format('d-m-Y');
+	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('EndDate')->Format('M-d-Y') : $this->obj('EndDate')->Format('d-M-Y');
 	}
 
 	public function getFormattedStartTime() {

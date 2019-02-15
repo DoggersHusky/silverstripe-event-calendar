@@ -20,7 +20,12 @@
 		"issues": "https://github.com/unclecheese/silverstripe-event-calendar/issues"
 	},
 	"extra": {
-		"installer-name": "event_calendar"
+		"installer-name": "event_calendar",
+        "expose": [
+            "images",
+			"css",
+			"javascript"
+        ]
 	},
 	"replace": {
 		"silverstripe/event-calendar": "*"

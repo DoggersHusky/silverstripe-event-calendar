@@ -50,7 +50,7 @@ class Calendar extends Page {
 
 	private static $reccurring_event_index = 0;
 
-	private static $icon = "event_calendar/images/calendar";
+	private static $icon = "resources/event_calendar/images/calendar-file.gif";
 
 	private static $description = "A collection of Calendar Events";
 
@@ -238,7 +238,7 @@ class Calendar extends Page {
 				$relation => $ids
 			))
 			->innerJoin($eventClass, "$relation = \"{$eventClass}\".\"ID\"")
-			->innerJoin("SiteTree", "\"SiteTree\".\"ID\" = \"{$eventClass}\".\"ID\"")
+			->innerJoin(SiteTree::class, "\"SiteTree\".\"ID\" = \"{$eventClass}\".\"ID\"")
 			->where("Recursion != 1");
 		if($start && $end) {
 			$list = $list->where("
