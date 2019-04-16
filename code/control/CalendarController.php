@@ -40,7 +40,7 @@ class CalendarController extends PageController {
 	public function init() {
 		parent::init();
 		RSSFeed::linkToFeed($this->Link() . "rss", $this->RSSTitle ? $this->RSSTitle : $this->Title);
-		Requirements::themedCSS('calendar','event_calendar');
+		Requirements::themedCSS('calendar');
 		if(!Calendar::config()->get('jquery_included')) {
 			Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
 		}
@@ -276,7 +276,7 @@ class CalendarController extends PageController {
 			else {
 				$FILENAME = preg_replace("/[^a-zA-Z0-9s]/", "", urldecode($_REQUEST['title']));
 			}
-
+			
 			$FILENAME .= ".ics";
 			$HOST = $_SERVER['HTTP_HOST'];
 			$TIMEZONE = Calendar::config()->timezone;
@@ -293,7 +293,7 @@ class CalendarController extends PageController {
 			}
 			$TITLE = $feed ? $_REQUEST['title'] : $event->Title;
 			$CONTENT = $feed ? $_REQUEST['content'] : $event->obj('Content')->Summary();
-			$LOCATION = $feed ? $_REQUEST['location'] : $event->Location;
+			$LOCATION = $feed ? $_REQUEST['location'] : $event->Location->Title;
 			$this->getResponse()->addHeader('Cache-Control','private');
 			$this->getResponse()->addHeader('Content-Description','File Transfer');
 			$this->getResponse()->addHeader('Content-Type','text/calendar');
@@ -303,7 +303,7 @@ class CalendarController extends PageController {
  			}
  			else {
  				$this->getResponse()->addHeader("Content-disposition","attachment; filename=".$FILENAME);
- 			}
+			 }
 			$result = trim(strip_tags($this->customise(array(
 				'HOST' => $HOST,
 				'LANGUAGE' => $LANGUAGE,
@@ -316,6 +316,7 @@ class CalendarController extends PageController {
 				'CONTENT' => $CONTENT,
 				'LOCATION' => $LOCATION
 			))->renderWith(array('ics'))));
+			
 			return $result;
 		}
 		else {

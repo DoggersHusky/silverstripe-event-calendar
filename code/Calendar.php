@@ -11,6 +11,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Control\Controller;
+use SilverStripe\CMS\Model\SiteTree;
 
 class Calendar extends Page {
 
@@ -238,7 +239,7 @@ class Calendar extends Page {
 				$relation => $ids
 			))
 			->innerJoin($eventClass, "$relation = \"{$eventClass}\".\"ID\"")
-			->innerJoin(SiteTree::class, "\"SiteTree\".\"ID\" = \"{$eventClass}\".\"ID\"")
+			->innerJoin("SiteTree", "\"SiteTree\".\"ID\" = \"{$eventClass}\".\"ID\"")
 			->where("Recursion != 1");
 		if($start && $end) {
 			$list = $list->where("
@@ -345,7 +346,10 @@ class Calendar extends Page {
 		$c = $this->getDateTimeClass();
 		$relation = $this->getDateToEventRelation();
 		$e = new $c();
-		foreach($recurring_event_datetime->db() as $field => $type) {
+
+		$test = array("StartDate"=>"Date","StartTime"=>"Time","EndDate"=>"Date","EndTime"=>"Time","AllDay"=>"Boolean");
+		//$recurring_event_datetime->db()
+		foreach($test as $field => $type) {
 			$e->$field = $recurring_event_datetime->$field;
 		}
 		$e->DateTimeID = $recurring_event_datetime->ID;

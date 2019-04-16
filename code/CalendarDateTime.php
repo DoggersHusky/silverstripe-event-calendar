@@ -1,260 +1,288 @@
 <?php
 
-use SilverStripe\ORM\DataObject;
+use SilverStripe\Control\Controller;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TimeField;
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataList;
-use SilverStripe\Security\Permission;
-use SilverStripe\Security\Security;
+use SilverStripe\ORM\DataObject;
 
-class CalendarDateTime extends DataObject {
-	
-	private static $db = [
-		'StartDate' => 'Date',
-		'StartTime' => 'Time',
-		'EndDate' => 'Date',
-		'EndTime' => 'Time',
-		'AllDay' => 'Boolean'		
-	];
-	
-	private static $has_one = [
-		'Event' => CalendarEvent::class
-	];
+class CalendarDateTime extends DataObject
+{
 
-	private static $date_format_override;
+    private static $db = [
+        'StartDate' => 'Date',
+        'StartTime' => 'Time',
+        'EndDate' => 'Date',
+        'EndTime' => 'Time',
+        'AllDay' => 'Boolean',
+    ];
 
-	private static $time_format_override;
+    private static $has_one = [
+        'Event' => CalendarEvent::class,
+    ];
 
-	private static $default_sort = "StartDate ASC, StartTime ASC";
+    private static $date_format_override;
 
-	/**
-	 * Set to the timezone offset (E.g. +12:00 for GMT+12). Must be in ISO 8601 format
-	 * 
-	 * @config
-	 * @see http://php.net/manual/en/function.date.php
-	 * @var string
-	 */
-	private static $offset = "+00:00";
+    private static $time_format_override;
 
-	public function getCMSFields() {
-		//DateField::set_default_config('showcalendar', true);
-        
-		$f = new FieldList(
-			new DateField('StartDate',_t('CalendarDateTime.STARTDATE','Start date')),
-			new DateField('EndDate',_t('CalendarDateTime.ENDDATE','End date')),
-			new TimeField('StartTime', _t('CalendarDateTime.STARTTIME','Start time')),
-			new TimeField('EndTime', _t('CalendarDateTime.ENDTIME','End time')),
-			new CheckboxField('AllDay', _t('CalendarDateTime.ALLDAY','This event lasts all day'))
-		);
+    private static $default_sort = "StartDate ASC, StartTime ASC";
 
-		$this->extend('updateCMSFields', $f);
+    /**
+     * Set to the timezone offset (E.g. +12:00 for GMT+12). Must be in ISO 8601 format
+     *
+     * @config
+     * @see http://php.net/manual/en/function.date.php
+     * @var string
+     */
+    private static $offset = "+00:00";
 
-		return $f;
-	}
+    public function getCMSFields()
+    {
+        //DateField::set_default_config('showcalendar', true);
 
-	public function summaryFields() {
-		return array (
-			'FormattedStartDate' => _t('Calendar.STARTDATE','Start date'),
-			'FormattedEndDate' => _t('Calendar.ENDDATE','End date'),
-			'FormattedStartTime' => _t('Calendar.STARTTIME','Start time'),
-			'FormattedEndTime' => _t('Calendar.ENDTIME','End time'),
-			'FormattedAllDay' => _t('Calendar.ALLDAY','All day'),
-		);
-	}
+        $f = new FieldList(
+            new DateField('StartDate', _t('CalendarDateTime.STARTDATE', 'Start date')),
+            new DateField('EndDate', _t('CalendarDateTime.ENDDATE', 'End date')),
+            new TimeField('StartTime', _t('CalendarDateTime.STARTTIME', 'Start time')),
+            new TimeField('EndTime', _t('CalendarDateTime.ENDTIME', 'End time')),
+            new CheckboxField('AllDay', _t('CalendarDateTime.ALLDAY', 'This event lasts all day'))
+        );
 
-	public function Link() {
-		return Controller::join_links($this->Event()->Link(),"?date=".$this->StartDate);
-	}
+        $this->extend('updateCMSFields', $f);
 
-	public function DateRange() {		
-		list($strStartDate,$strEndDate) = CalendarUtil::get_date_string($this->StartDate,$this->EndDate);
-		$html =   "<span class='dtstart' title='".$this->MicroformatStart()."'>" . $strStartDate . "</span>"; 
-		$html .=	($strEndDate != "") ? "-" : "";
-		$html .= "<span class='dtend' title='" .$this->MicroformatEnd() ."'>";
-		$html .=    ($strEndDate != "") ? $strEndDate : "";
-		$html .=  "</span>";
-		
+        return $f;
+    }
+
+    public function summaryFields()
+    {
+        return array(
+            'FormattedStartDate' => _t('Calendar.STARTDATE', 'Start date'),
+            'FormattedEndDate' => _t('Calendar.ENDDATE', 'End date'),
+            'FormattedStartTime' => _t('Calendar.STARTTIME', 'Start time'),
+            'FormattedEndTime' => _t('Calendar.ENDTIME', 'End time'),
+            'FormattedAllDay' => _t('Calendar.ALLDAY', 'All day'),
+        );
+    }
+
+    public function Link()
+    {
+        return Controller::join_links($this->Event()->Link(), "?date=" . $this->StartDate);
+    }
+
+    public function DateRange()
+    {
+        list($strStartDate, $strEndDate) = CalendarUtil::get_date_string($this->StartDate, $this->EndDate);
+        $html = "<span class='dtstart' title='" . $this->MicroformatStart() . "'>" . $strStartDate . "</span>";
+        $html .= ($strEndDate != "") ? "-" : "";
+        $html .= "<span class='dtend' title='" . $this->MicroformatEnd() . "'>";
+        $html .= ($strEndDate != "") ? $strEndDate : "";
+        $html .= "</span>";
+
         $htmlText = SilverStripe\ORM\FieldType\DBHTMLText::create();
         $htmlText->setValue($html);
-        
-		return $htmlText;
-	}
-	
-	public function TimeRange() {
-		$func = CalendarUtil::get_time_format() == "24" ? "Nice24" : "Nice";
-		$ret = $this->obj('StartTime')->$func();
-		$ret .= $this->EndTime ? " &mdash; " . $this->obj('EndTime')->$func() : "";
-		return $ret;
-	}
 
-	public function Announcement() {
-		return $this->ClassName == "CalendarAnnouncement";
-	}
+        return $htmlText;
+    }
 
-	public function OtherDates() {
-		if($this->Announcement()) {
-			return false;
-		}
-		
-		if($this->Event()->Recursion) {	
-			return $this->Event()->Parent()->getNextRecurringEvents($this->Event(), $this);
-		}
-		
-		return DataList::create($this->ClassName)
-			->where("EventID = {$this->EventID}")
-			->where("StartDate != '{$this->StartDate}'")
-			->limit($this->Event()->Parent()->OtherDatesCount);
-	}
+    public function TimeRange()
+    {
+        $func = CalendarUtil::get_time_format() == "24" ? "Nice24" : "Nice";
+        $ret = $this->obj('StartTime')->$func();
+        $ret .= $this->EndTime ? " &mdash; " . $this->obj('EndTime')->$func() : "";
+        return $ret;
+    }
 
-	public function MicroformatStart($offset = true) {
-		if(!$this->StartDate)
-			return "";
-			
-		$date = $this->StartDate;
-	
-		if($this->AllDay)
-			$time = "00:00:00";
-		else
-			$time = $this->StartTime ? $this->StartTime : "00:00:00";
-	
-		return CalendarUtil::microformat($date, $time, self::config()->offset);
-	}
+    public function Announcement()
+    {
+        return $this->ClassName == "CalendarAnnouncement";
+    }
 
-	public function MicroformatEnd($offset = true) {
-		if($this->AllDay && $this->StartDate) {
-			$time = "00:00:00";
-			$end = sfDate::getInstance($this->StartDate);
-			$date = $end->tomorrow()->date();
-			unset($end);
-		}
-		else {
-			$date = $this->EndDate ? $this->EndDate : $this->StartDate;
-			$time = $this->EndTime && $this->StartTime ? $this->EndTime : (!$this->EndTime && $this->StartTime ? $this->StartTime : "00:00:00");
-		}
+    public function OtherDates()
+    {
+        if ($this->Announcement()) {
+            return false;
+        }
 
-		return CalendarUtil::microformat($date, $time, self::config()->offset);
-	}
+        if ($this->Event()->Recursion) {
+            return $this->Event()->Parent()->getNextRecurringEvents($this->Event(), $this);
+        }
 
-	public function ICSLink() {
-		$ics_start = $this->obj('StartDate')->Format('Ymd')."T".$this->obj('StartTime')->Format('His');
-		if($this->EndDate) {
-			$ics_end = $this->obj('EndDate')->Format('Ymd')."T".$this->obj('EndTime')->Format('His'); 
-		}
-		else {
-			$ics_end = $ics_start;
-		}
-		if($this->Feed) {
-			return Controller::join_links(
-				$this->Calendar()->Link(),
-				"ics",
-				$this->ID,
-				$ics_start . "-" . $ics_end,
-				"?title=".urlencode($this->Title)
-			);
-		}
-		else if($this->Announcement()) {
-			return Controller::join_links(
-				$this->Calendar()->Link(),
-				"ics","announcement-".$this->ID, 
-				$ics_start . "-" . $ics_end
-			); 
-		}
-		return Controller::join_links(
-			$this->Event()->Parent()->Link(),
-			"ics",
-			$this->Event()->ID,
-			$ics_start . "-" . $ics_end
-		);
-	}
+        return DataList::create($this->ClassName)
+            ->where("EventID = {$this->EventID}")
+            ->where("StartDate != '{$this->StartDate}'")
+            ->limit($this->Event()->Parent()->OtherDatesCount);
+    }
 
-	public function getFormattedStartDate() {
-	   if(!$this->StartDate) return "--";
-	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('StartDate')->Format('M-d-Y') : $this->obj('StartDate')->Format('d-M-Y');
-	}
-	
-	public function getFormattedEndDate() {
-	   if(!$this->EndDate) return "--";
-	   return CalendarUtil::get_date_format() == "mdy" ? $this->obj('EndDate')->Format('M-d-Y') : $this->obj('EndDate')->Format('d-M-Y');
-	}
+    public function MicroformatStart($offset = true)
+    {
+        if (!$this->StartDate) {
+            return "";
+        }
 
-	public function getFormattedStartTime() {
-	   if(!$this->StartTime) return "--";
-	   return CalendarUtil::get_time_format() == "12" ? $this->obj('StartTime')->Nice() : $this->obj('StartTime')->Nice24();
-	}
+        $date = $this->StartDate;
 
-	public function getFormattedEndTime() {
-	   if(!$this->EndTime) return "--";
-	   return CalendarUtil::get_time_format() == "12" ? $this->obj('EndTime')->Nice() : $this->obj('EndTime')->Nice24();
-	}
+        if ($this->AllDay) {
+            $time = "00:00:00";
+        } else {
+            $time = $this->StartTime ? $this->StartTime : "00:00:00";
+        }
 
-	public function getFormattedAllDay() {
-	   return $this->AllDay == 1 ? _t('YES','Yes') : _t('NO','No');
-	}
+        return CalendarUtil::microformat($date, $time, self::config()->offset);
+    }
 
-	public function getTitle() {
-		return $this->Event()->Title;
-	}
+    public function MicroformatEnd($offset = true)
+    {
+        if ($this->AllDay && $this->StartDate) {
+            $time = "00:00:00";
+            $end = sfDate::getInstance($this->StartDate);
+            $date = $end->tomorrow()->date();
+            unset($end);
+        } else {
+            $date = $this->EndDate ? $this->EndDate : $this->StartDate;
+            $time = $this->EndTime && $this->StartTime ? $this->EndTime : (!$this->EndTime && $this->StartTime ? $this->StartTime : "00:00:00");
+        }
 
-	public function getContent() {
-		return $this->Event()->Content;
-	}
+        return CalendarUtil::microformat($date, $time, self::config()->offset);
+    }
 
-	public function getAllDatesInRange() {
-		$start = sfDate::getInstance($this->StartDate);
-		$end = sfDate::getInstance($this->EndDate);
-		$dates = array ();
-		do {
-			$dates[] = $start->format('Y-m-d');
-			$start->tomorrow();
-		} while($start->get() <= $end->get());
-		return $dates;
-	}
-	
-//	public function canCreate($member = null) {
-//		if (!$member) {
-//			$member = Security::getCurrentUser();
-//		}
-//		$extended = $this->extendedCan(__FUNCTION__, $member);
-//		if($extended !== null) {
-//			return $extended;
-//		}
-//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-//	}
-//
-//	public function canEdit($member = null) {
-//		if (!$member) {
-//			$member = Security::getCurrentUser();
-//		}
-//		$extended = $this->extendedCan(__FUNCTION__, $member);
-//		if($extended !== null) {
-//			return $extended;
-//		}
-//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-//	}
-//
-//	public function canDelete($member = null) {
-//		if (!$member) {
-//			$member = Security::getCurrentUser();
-//		}
-//		$extended = $this->extendedCan(__FUNCTION__, $member);
-//		if($extended !== null) {
-//			return $extended;
-//		}
-//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-//	}
-//
-//	public function canView($member = null) {
-//		if (!$member) {
-//			$member = Security::getCurrentUser();
-//		}
-//		$extended = $this->extendedCan(__FUNCTION__, $member);
-//		if($extended !== null) {
-//			return $extended;
-//		}
-//		return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
-//	}
+    public function ICSLink()
+    {
+        $ics_start = $this->obj('StartDate')->Format('Ymd') . "T" . $this->obj('StartTime')->Format('His');
+        if ($this->EndDate) {
+            $ics_end = $this->obj('EndDate')->Format('Ymd') . "T" . $this->obj('EndTime')->Format('His');
+        } else {
+            $ics_end = $ics_start;
+        }
+        if ($this->Feed) {
+            return Controller::join_links(
+                $this->Calendar()->Link(),
+                "ics",
+                $this->ID,
+                $ics_start . "-" . $ics_end,
+                "?title=" . urlencode($this->Title)
+            );
+        } else if ($this->Announcement()) {
+            return Controller::join_links(
+                $this->Calendar()->Link(),
+                "ics", "announcement-" . $this->ID,
+                $ics_start . "-" . $ics_end
+            );
+        }
+        return Controller::join_links(
+            $this->Event()->Parent()->Link(),
+            "ics",
+            $this->Event()->ID,
+            $ics_start . "-" . $ics_end
+        );
+    }
+
+    public function getFormattedStartDate()
+    {
+        if (!$this->StartDate) {
+            return "--";
+        }
+
+        return CalendarUtil::get_date_format() == "mdy" ? $this->obj('StartDate')->Format('M-d-Y') : $this->obj('StartDate')->Format('d-M-Y');
+    }
+
+    public function getFormattedEndDate()
+    {
+        if (!$this->EndDate) {
+            return "--";
+        }
+
+        return CalendarUtil::get_date_format() == "mdy" ? $this->obj('EndDate')->Format('M-d-Y') : $this->obj('EndDate')->Format('d-M-Y');
+    }
+
+    public function getFormattedStartTime()
+    {
+        if (!$this->StartTime) {
+            return "--";
+        }
+
+        return CalendarUtil::get_time_format() == "12" ? $this->obj('StartTime')->Nice() : $this->obj('StartTime')->Nice24();
+    }
+
+    public function getFormattedEndTime()
+    {
+        if (!$this->EndTime) {
+            return "--";
+        }
+
+        return CalendarUtil::get_time_format() == "12" ? $this->obj('EndTime')->Nice() : $this->obj('EndTime')->Nice24();
+    }
+
+    public function getFormattedAllDay()
+    {
+        return $this->AllDay == 1 ? _t('YES', 'Yes') : _t('NO', 'No');
+    }
+
+    public function getTitle()
+    {
+        return $this->Event()->Title;
+    }
+
+    public function getContent()
+    {
+        return $this->Event()->Content;
+    }
+
+    public function getAllDatesInRange()
+    {
+        $start = sfDate::getInstance($this->StartDate);
+        $end = sfDate::getInstance($this->EndDate);
+        $dates = array();
+        do {
+            $dates[] = $start->format('Y-m-d');
+            $start->tomorrow();
+        } while ($start->get() <= $end->get());
+        return $dates;
+    }
+
+//    public function canCreate($member = null) {
+    //        if (!$member) {
+    //            $member = Security::getCurrentUser();
+    //        }
+    //        $extended = $this->extendedCan(__FUNCTION__, $member);
+    //        if($extended !== null) {
+    //            return $extended;
+    //        }
+    //        return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+    //    }
+    //
+    //    public function canEdit($member = null) {
+    //        if (!$member) {
+    //            $member = Security::getCurrentUser();
+    //        }
+    //        $extended = $this->extendedCan(__FUNCTION__, $member);
+    //        if($extended !== null) {
+    //            return $extended;
+    //        }
+    //        return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+    //    }
+    //
+    //    public function canDelete($member = null) {
+    //        if (!$member) {
+    //            $member = Security::getCurrentUser();
+    //        }
+    //        $extended = $this->extendedCan(__FUNCTION__, $member);
+    //        if($extended !== null) {
+    //            return $extended;
+    //        }
+    //        return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+    //    }
+    //
+    //    public function canView($member = null) {
+    //        if (!$member) {
+    //            $member = Security::getCurrentUser();
+    //        }
+    //        $extended = $this->extendedCan(__FUNCTION__, $member);
+    //        if($extended !== null) {
+    //            return $extended;
+    //        }
+    //        return Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+    //    }
 
 }

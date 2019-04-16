@@ -1,60 +1,62 @@
 <?php
 
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Security\Permission;
+use SilverStripe\ORM\DataObject;
 
-class RecurringException extends DataObject {
-	
-	private static $db = array (
-		'ExceptionDate' => 'Date'
-	);
-	
-	private static $has_one = array (
-		'CalendarEvent' => 'CalendarEvent'
-	);
+class RecurringException extends DataObject
+{
 
+    private static $db = array(
+        'ExceptionDate' => 'Date',
+    );
 
-	private static $default_sort = "ExceptionDate ASC";
-	
+    private static $has_one = array(
+        'CalendarEvent' => 'CalendarEvent',
+    );
 
-    public function getCMSFields() {
-            DateField::set_default_config('showcalendar', true);
-            $f = new FieldList(
-                    new DateField('ExceptionDate',_t('CalendarDateTime.EXCEPTIONDATE','Exception Date'))
-            );
+    private static $default_sort = "ExceptionDate ASC";
 
-            $this->extend('updateCMSFields', $f);
+    public function getCMSFields()
+    {
+        $f = new FieldList(
+            new DateField('ExceptionDate', _t('CalendarDateTime.EXCEPTIONDATE', 'Exception Date'))
+        );
 
-            return $f;
+        $this->extend('updateCMSFields', $f);
+
+        return $f;
     }
 
-   public function summaryFields() {
-            return array (
-                    'FormattedExceptionDate' => _t('Calendar.EXCEPTIONDATE','Exception date')
-            );
+    public function summaryFields()
+    {
+        return array(
+            'FormattedExceptionDate' => _t('Calendar.EXCEPTIONDATE', 'Exception date'),
+        );
     }
 
-    public function getFormattedExceptionDate() {
-       if(!$this->ExceptionDate) return "--";
-       return CalendarUtil::get_date_format() == "mdy" ? $this->obj('ExceptionDate')->Format('m-d-Y') : $this->obj('ExceptionDate')->Format('d-m-Y');
-    }
+    public function getFormattedExceptionDate()
+    {
+        if (!$this->ExceptionDate) {
+            return "--";
+        }
 
+        return CalendarUtil::get_date_format() == "mdy" ? $this->obj('ExceptionDate')->Format('M-d-Y') : $this->obj('ExceptionDate')->Format('M-d-Y');
+    }
 
 //    public function canCreate($member = null) {
-//        return Permission::check("CMS_ACCESS_CMSMain");
-//    }
-//    
-//    public function canEdit($member = null) {
-//        return Permission::check("CMS_ACCESS_CMSMain");
-//    }
-//    
-//    public function canDelete($member = null) {
-//        return Permission::check("CMS_ACCESS_CMSMain");
-//    }
-//    
-//    public function canView($member = null) {
-//        return Permission::check("CMS_ACCESS_CMSMain");
-//    }
+    //        return Permission::check("CMS_ACCESS_CMSMain");
+    //    }
+    //
+    //    public function canEdit($member = null) {
+    //        return Permission::check("CMS_ACCESS_CMSMain");
+    //    }
+    //
+    //    public function canDelete($member = null) {
+    //        return Permission::check("CMS_ACCESS_CMSMain");
+    //    }
+    //
+    //    public function canView($member = null) {
+    //        return Permission::check("CMS_ACCESS_CMSMain");
+    //    }
 }

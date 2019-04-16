@@ -29,6 +29,7 @@ class CalendarWidget extends ViewableData {
 		foreach($this->options as $opt => $value) {
 			$attributes .= sprintf('data-%s="%s" ', $opt, Convert::raw2att($value));
 		}
+		
 		return $attributes;
 	}
 
@@ -46,7 +47,7 @@ class CalendarWidget extends ViewableData {
         }	
 		Requirements::javascript("event_calendar/javascript/calendar_widget.js");
 		$locale_file = _t('Calendar.DATEJSFILE','calendar_en.js');
-		Requirements::javascript("event_calendar/javascript/lang/{$locale_file}");
+		Requirements::javascript($this->ThemeDir() . "/javascript/lang/{$locale_file}");
 		Requirements::javascript("event_calendar/javascript/calendar_widget_init.js");
 		Requirements::css("event_calendar/css/calendar_widget.css");
 		return '<div class="calendar-widget" ' . $this->getDataAttributes() . '></div>';

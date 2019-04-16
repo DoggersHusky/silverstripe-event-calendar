@@ -1,5 +1,7 @@
 <?php
 
+use SilverStripe\ORM\DataList;
+
 class RecursionReader {
 	
 	const DAY = 86400;
